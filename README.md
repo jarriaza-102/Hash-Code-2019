@@ -1,4 +1,4 @@
-# Hash-Code-2019
+# Google HashCode 2019
 
 Example:
 80%
