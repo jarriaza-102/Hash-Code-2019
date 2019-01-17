@@ -84,7 +84,7 @@ function getPizzaData(rows, cols, max, minimum, content) {
 
 function getVerticalSlices(startCol, startRow, pizza, max) {
   let slices = [];
-  let coordinates = { fromX: 0, fromY: 0, toX: 0, toY: 0};
+  let coordinates = { fromX: 0, fromY: 0, toX: 0, toY: 0 };
   let ingredients = { tomatoes: 0, mushrooms: 0 };
   let length = 0;
   for (let x = startCol; x < pizza.cols; x++) {
@@ -107,17 +107,52 @@ function getVerticalSlices(startCol, startRow, pizza, max) {
             setCellsBusy(coordinates, pizza);
           }
           length = 0;
-          coordinates = { fromX: 0, fromY: 0, toX: 0, toY: 0};
+          coordinates = { fromX: 0, fromY: 0, toX: 0, toY: 0 };
           ingredients.tomatoes = 0;
           ingredients.mushrooms = 0;
           if (pizza.rows - y + 1 < pizza.max) {
             break;
+          }
+        } else if (length == pizza.rows && max - length == pizza.rows) {
+          if (ingredients.tomatoes >= pizza.minimum && ingredients.mushrooms >= pizza.minimum) {
+            const canComplete = canCompleteNextCol(x + 1, pizza);
+            if (!canComplete) {
+              coordinates.toX = x;
+              coordinates.toY = y;
+              slices.push(coordinates);
+              setCellsBusy(coordinates, pizza);
+              length = 0;
+              coordinates = { fromX: 0, fromY: 0, toX: 0, toY: 0 };
+              ingredients.tomatoes = 0;
+              ingredients.mushrooms = 0;
+              if (pizza.rows - y + 1 < pizza.max) {
+                break;
+              }
+            }
           }
         }
       }
     }
   }
   return slices;
+}
+
+function canCompleteNextCol(col, pizza) {
+  let response = true;
+  let ingredients = { tomatoes: 0, mushrooms: 0 };
+  for (let y = 0; y < pizza.rows; y++) {
+    if (!pizza.cells[y][col].busy) {
+      if (pizza.cells[y][col].ingredient == 'T') ingredients.tomatoes++;
+      if (pizza.cells[y][col].ingredient == 'M') ingredients.mushrooms++;
+
+      if (ingredients.tomatoes >= pizza.minimum && ingredients.mushrooms >= pizza.minimum) {
+        response = false;
+        break;
+      }
+
+    }
+  }
+  return response;
 }
 
 function getHorizontalSlices(startCol, startRow, pizza, max) {
@@ -225,9 +260,9 @@ function mapAsBoth(dataSet, content, inverse) {
 
 function getMax(arr, prop) {
   var max;
-  for (var i=0 ; i<arr.length ; i++) {
-      if (!max || parseInt(arr[i][prop]) > parseInt(max[prop]))
-          max = arr[i];
+  for (var i = 0; i < arr.length; i++) {
+    if (!max || parseInt(arr[i][prop]) > parseInt(max[prop]))
+      max = arr[i];
   }
   return max;
 }
