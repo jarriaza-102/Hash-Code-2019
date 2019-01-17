@@ -1,7 +1,7 @@
 # Google HashCode 2019
 
 Example:
-80%
+100%
 
 Small:
 95.24%
